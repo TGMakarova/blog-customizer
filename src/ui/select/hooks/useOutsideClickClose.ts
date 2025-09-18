@@ -1,25 +1,26 @@
 import { useEffect } from 'react';
 
 type UseOutsideClickClose = {
-	isOpen: boolean;
+	isOpenSideBar: boolean;
 	onChange: (newValue: boolean) => void;
 	onClose?: () => void;
-	rootRef: React.RefObject<HTMLDivElement>;
+	sideBarRef: React.RefObject<HTMLDivElement>;
 };
 
 export const useOutsideClickClose = ({
-	isOpen,
-	rootRef,
+	isOpenSideBar,
+	sideBarRef,
 	onClose,
 	onChange,
 }: UseOutsideClickClose) => {
-	useEffect(() => {
+	useEffect(() => {if (!isOpenSideBar) {return}
 		const handleClick = (event: MouseEvent) => {
 			const { target } = event;
-			if (target instanceof Node && !rootRef.current?.contains(target)) {
-				isOpen && onClose?.();
+			if (target instanceof Node && !sideBarRef.current?.contains(target)) {
+				isOpenSideBar && onClose?.();
 				onChange?.(false);
 			}
+		
 		};
 
 		window.addEventListener('mousedown', handleClick);
@@ -27,5 +28,5 @@ export const useOutsideClickClose = ({
 		return () => {
 			window.removeEventListener('mousedown', handleClick);
 		};
-	}, [onClose, onChange, isOpen]);
+	}, [onClose, onChange, isOpenSideBar]);
 };

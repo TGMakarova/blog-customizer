@@ -2,9 +2,7 @@ import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Select } from 'src/ui/select';
-import { StoryDecorator } from 'src/ui/story-decorator';
 import { Separator } from 'src/ui/separator';
-import { Text } from 'src/ui/text';
 import { useState, useRef, SyntheticEvent } from 'react';
 import styles from './ArticleParamsForm.module.scss';
 import {
@@ -12,19 +10,15 @@ import {
 	backgroundColors,
 	contentWidthArr,
 	fontColors,
-	fontFamilyClasses,
 	fontFamilyOptions,
 	fontSizeOptions,
 	OptionType,
 } from 'src/constants/articleProps';
-import {
-	optionalEnvToBoolean,
-	validateConfigurationFiles,
-} from 'storybook/internal/common';
-import { Option } from 'src/ui/select/Option';
+
 import clsx from 'clsx';
-import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
+
 import { defaultArticleState } from 'src/constants/articleProps';
+import { useCloseOnOutsideClickOrEsc } from 'src/ui/select/hooks/UseCloseOnOutsideClickOrEsc';
 
 type ArticleParamsFormProps = {
 	currentArticleState: ArticleStateType;
@@ -35,8 +29,10 @@ export const ArticleParamsForm = ({
 	currentArticleState,
 	setCurrentArticleState,
 }: ArticleParamsFormProps) => {
-	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const rootRef = useRef<HTMLDivElement>(null);
+	const [isOpenSideBar, setIsOpenSideBar] = useState<boolean>(false);
+
+	const sideBarRef = useRef<HTMLDivElement>(null);
+
 	const [newFontFamilyOption, setNewFontFamilyOption] = useState<OptionType>(
 		currentArticleState.fontFamilyOption
 	);
@@ -53,12 +49,12 @@ export const ArticleParamsForm = ({
 		currentArticleState.fontSizeOption
 	);
 
-	useOutsideClickClose({
-		isOpen,
-		rootRef,
-		onClose: () => setIsOpen(!isOpen),
-		onChange: setIsOpen,
+	useCloseOnOutsideClickOrEsc({
+		isOpenSideBar,
+		sideBarRef,
+		onClose: () => setIsOpenSideBar(!isOpenSideBar),
 	});
+
 	const handleSubmitForm = (e: SyntheticEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setCurrentArticleState({
@@ -80,16 +76,19 @@ export const ArticleParamsForm = ({
 
 	return (
 		<>
-			<div ref={rootRef}>
+			<div ref={sideBarRef}>
 				<ArrowButton
-					isOpen={isOpen}
+					isOpen={isOpenSideBar}
 					onClick={() => {
-						setIsOpen(!isOpen);
+						setIsOpenSideBar(!isOpenSideBar);
 					}}
 				/>
 
 				<aside
-					className={clsx(styles.container, isOpen && styles.container_open)}>
+					className={clsx(
+						styles.container,
+						isOpenSideBar && styles.container_open
+					)}>
 					<form
 						onSubmit={handleSubmitForm}
 						onReset={handleResetForm}
